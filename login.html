@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Sankhya</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; }
+        .popup { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); width:320px; }
+        h2 { text-align:center; margin-top:0; }
+        label { display:block; margin-top:10px; }
+        input { width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:6px; }
+        button { margin-top:15px; width:100%; padding:10px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer; }
+        button:hover { background:#0056b3; }
+        .msg { margin-top:10px; text-align:center; font-size:14px; }
+    </style>
+</head>
+<body>
+<div class="popup">
+    <h2>Login Sankhya</h2>
+    <label for="usuario">Usuário:</label>
+    <input type="text" id="usuario" placeholder="Digite o usuário" required>
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" placeholder="Digite a senha" required>
+    <button onclick="fazerLogin()">Entrar</button>
+    <div class="msg" id="mensagem"></div>
+</div>
+
+<script>
+    async function fazerLogin() {
+      const usuario = document.getElementById("usuario").value;
+      const senha = document.getElementById("senha").value;
+      const mensagem = document.getElementById("mensagem");
+
+      // Recebe chatId da query string
+      const params = new URLSearchParams(window.location.search);
+      const chatId = params.get("chatId");
+
+      if (!chatId) {
+        mensagem.textContent = "❌ ChatId não informado.";
+        return;
+      }
+
+      mensagem.textContent = "Autenticando...";
+
+      try {
+        const resp = await fetch(`http://localhost:8080/api/auth/login?chatId=${chatId}&username=${usuario}&password=${senha}`, {
+          method: "POST"
+        });
+
+        const sucesso = await resp.json();
+
+        if (sucesso) {
+          mensagem.textContent = "✅ Login realizado com sucesso!";
+          setTimeout(() => window.close(), 2000);
+        } else {
+          mensagem.textContent = "❌ Falha no login. Verifique suas credenciais.";
+        }
+      } catch (err) {
+        mensagem.textContent = "Erro de comunicação com o servidor.";
+        console.error(err);
+      }
+    }
+</script>
+</body>
+</html>
